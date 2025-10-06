@@ -1,0 +1,31 @@
+name: Deploy to Apache Web Server
+
+on:
+  push:
+    branches: [ test ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 195.15.240.84
+          username: deploy
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "."
+          target: "/var/www/html/Piscine_Ecole-IT"
+          overwrite: true
+
+      - name: Reload Apache
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 195.15.240.84
+          username: deploy
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo systemctl reload apache2
