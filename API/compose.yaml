@@ -1,25 +1,68 @@
+version: "3.9"
 
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-16}-alpine
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: citybuilder-backend
+    ports:
+      - "8082:80"  
+    volumes:
+      - ./src:/var/www/html
+      - ./apache/Piscine_Ecole-IT:/etc/apache2/sites-available/Piscine_Ecole-it
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+      - APACHE_DOCUMENT_ROOT=/var/www/html/Piscine_Ecole-IT
+      - DATABASE_URL=postgresql://app:!ChangeMe!@database:5432/app
+    depends_on:
+      - database
+    networks:
+      - citybuilder-net
+
+  database:
+    image: postgres:16-alpine
+    container_name: citybuilder-postgres
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=!ChangeMe!
     healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      test: ["CMD", "pg_isready", "-d", "app", "-U", "app"]
       timeout: 5s
       retries: 5
       start_period: 60s
     volumes:
-      - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - database_data:/var/lib/postgresql/data
+    networks:
+      - citybuilder-net
+
+  composer:
+    image: composer:2
+    container_name: citybuilder-composer
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+    command: ["install"]
+    networks:
+      - citybuilder-net
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: citybuilder-phpmyadmin
+    ports:
+      - "8083:80" 
+    environment:
+      - PMA_HOST=citybuilder-postgres
+      - PMA_USER=app
+      - PMA_PASSWORD=!ChangeMe!
+    depends_on:
+      - database
+    networks:
+      - citybuilder-net
+
+networks:
+  citybuilder-net:
+    external: true
 
 volumes:
-###> doctrine/doctrine-bundle ###
   database_data:
-###< doctrine/doctrine-bundle ###
