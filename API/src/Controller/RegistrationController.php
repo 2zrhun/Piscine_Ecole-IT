@@ -33,6 +33,10 @@ class RegistrationController extends AbstractController
         $user = new User();
         $user->setEmail($data['email']);
         $user->setPseudo($data['pseudo']);
+        $user->setRoles(['ROLE_USER']); // Rôle par défaut
+        $user->setXp(10);
+        $user->setMoney('500.00');
+        $user->setNrj(150);
         
         // Hasher le mot de passe
         $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
