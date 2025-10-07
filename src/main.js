@@ -6,6 +6,7 @@ import { createGrid } from './script/grid.js';
 import { createColoredGrid } from './script/grid.js';
 import { createPlane } from './script/plane.js';
 import { setupRaycast } from './script/raycast.js';
+import { createEnergyBlock } from './components/lifebar.js';
 
 // Paramètres de la map
 const sizeGrid = 50;
@@ -28,6 +29,9 @@ setupRaycast(scene, camera, plane);
 // Ajouter la couleur de la maps
 const coloredCells = createColoredGrid(sizeGrid, divisionGrid);
 coloredCells.forEach(cell => scene.add(cell));
+
+// Créer le bloc d'affichage avec énergie et argent
+createEnergyBlock(50, 100);
 
 // Redimension
 window.addEventListener('resize', () => {
