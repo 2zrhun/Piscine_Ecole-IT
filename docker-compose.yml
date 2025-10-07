@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+ # php + apache2
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: citybuilder-backend
+    ports:
+      - "8080:80"            
+    volumes:
+      - ./src:/var/www/html
+      - ./apache/Piscine_Ecole-IT:/etc/apache2/sites-available/Piscine_Ecole-it
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/Piscine_Ecole-IT
+      - DATABASE_URL=mysql://symfony:symfony@mariadb:3306/citybuilder
+    depends_on:
+      - mariadb
+    networks:
+      - citybuilder-net
+
+# MariaDB 
+
+  mariadb:
+    image: mariadb:11.3
+    container_name: citybuilder-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: " "
+      MYSQL_DATABASE: citybuilder
+      MYSQL_USER: pierre
+      MYSQL_PASSWORD: pierre
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - citybuilder-net
+
+
+# Composer
+
+  composer:
+    image: composer:2
+    container_name: citybuilder-composer
+    working_dir: /
+    volumes:
+      - ./src:/
+    command: ["install"]
+    networks:
+      - citybuilder-net
+
+networks:
+  citybuilder-net:
+
+volumes:
+  db_data:
+
+#phpmyadmin
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: citybuilder-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=mariadb
+      - PMA_USER=symfony
+      - PMA_PASSWORD=symfony
+    depends_on:
+      - mariadb
+    networks:
+      - citybuilder-net

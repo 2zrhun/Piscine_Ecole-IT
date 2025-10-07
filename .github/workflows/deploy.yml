@@ -1,4 +1,4 @@
-name: Deploy to Apache Web Server
+name: Deploy to Apache WebSrv
 
 on:
   push:
