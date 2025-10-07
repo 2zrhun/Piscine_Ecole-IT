@@ -1,0 +1,27 @@
+{
+  "name": "piscine",
+  "version": "1.0.0",
+  "description": "\"# Piscine_Ecole-IT\"  \"# Piscine_Ecole-IT\"  fdsfd",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/2zrhun/Piscine_Ecole-IT.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/2zrhun/Piscine_Ecole-IT/issues"
+  },
+  "homepage": "https://github.com/2zrhun/Piscine_Ecole-IT#readme",
+  "dependencies": {
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "vite": "^7.1.9"
+  }
+}
