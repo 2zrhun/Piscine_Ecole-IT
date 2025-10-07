@@ -1,11 +1,10 @@
-import { createMap } from './script/map.js';
-import { createCamera } from './script/camera.js';
-import { createRenderer } from './script/renderer.js';
-import { createControls } from './script/control.js';
-import { createGrid } from './script/grid.js';
-import { createColoredGrid } from './script/grid.js';
-import { createPlane } from './script/plane.js';
-import { setupRaycast } from './script/raycast.js';
+import { createMap } from './script/Game/map.js';
+import { createCamera } from './script/Game/camera.js';
+import { createRenderer } from './script/Game/renderer.js';
+import { createControls } from './script/Game/control.js';
+import { createGrid } from './script/Game/grid.js';
+import { createColoredGrid } from './script/Game/grid.js';
+import { createPlane } from './script/Game/plane.js';
 import { createEnergyBlock } from './components/lifebar.js';
 
 // Paramètres de la map
@@ -22,9 +21,6 @@ const controls = createControls(camera, renderer);
 scene.add(createGrid(sizeGrid, divisionGrid));
 const plane = createPlane(sizeGrid);
 scene.add(plane);
-
-// Gestion clic
-setupRaycast(scene, camera, plane);
 
 // Ajouter la couleur de la maps
 const coloredCells = createColoredGrid(sizeGrid, divisionGrid);
