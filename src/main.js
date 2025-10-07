@@ -3,6 +3,7 @@ import { createCamera } from './script/camera.js';
 import { createRenderer } from './script/renderer.js';
 import { createControls } from './script/control.js';
 import { createGrid } from './script/grid.js';
+import { createColoredGrid } from './script/grid.js';
 import { createPlane } from './script/plane.js';
 import { setupRaycast } from './script/raycast.js';
 
@@ -23,6 +24,10 @@ scene.add(plane);
 
 // Gestion clic
 setupRaycast(scene, camera, plane);
+
+// Ajouter la couleur de la maps
+const coloredCells = createColoredGrid(sizeGrid, divisionGrid);
+coloredCells.forEach(cell => scene.add(cell));
 
 // Redimension
 window.addEventListener('resize', () => {

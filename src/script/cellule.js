@@ -6,6 +6,6 @@ export function createCellule(x, z, color = "gray", size = 1) {
     const material = new THREE.MeshBasicMaterial({ color: color });
     const cellule = new THREE.Mesh(geometry, material);
 
-    cellule.position.set(x + 0.5, 0.05, z + 0.5);
+    cellule.position.set(x + size / 2, 0.05, z + size / 2);
     return cellule;
 }

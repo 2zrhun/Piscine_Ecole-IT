@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
-export function setupRaycast(plateau, camera, plane) {
+export function setupRaycast(map, camera, plane) {
     const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
+    const souris = new THREE.Vector2();
 
     window.addEventListener('click', (e) => {
         souris.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -16,7 +16,7 @@ export function setupRaycast(plateau, camera, plane) {
             const cubeMat = new THREE.MeshLambertMaterial({ color: "orange" });
             const cube = new THREE.Mesh(cubeGeom, cubeMat);
             cube.position.set(Math.round(point.x), 0.5, Math.round(point.z));
-            plateau.add(cube);
+            map.add(cube);
         }
     });
 }
