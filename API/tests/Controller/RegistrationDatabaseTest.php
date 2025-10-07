@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use App\Entity\User;
+use App\Entity\Map;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,16 +51,22 @@ class RegistrationDatabaseTest extends WebTestCase
             if ($databasePlatform === 'mysql') {
                 $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
                 $connection->executeStatement('DELETE FROM user');
+                $connection->executeStatement('DELETE FROM map');
                 $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
                 $connection->executeStatement('ALTER TABLE user AUTO_INCREMENT = 1');
+                $connection->executeStatement('ALTER TABLE map AUTO_INCREMENT = 1');
             } elseif ($databasePlatform === 'sqlite') {
                 $connection->executeStatement('DELETE FROM user');
+                $connection->executeStatement('DELETE FROM map');
                 $connection->executeStatement('DELETE FROM sqlite_sequence WHERE name = "user"');
+                $connection->executeStatement('DELETE FROM sqlite_sequence WHERE name = "map"');
             } else {
                 $connection->executeStatement('TRUNCATE TABLE user RESTART IDENTITY CASCADE');
+                $connection->executeStatement('TRUNCATE TABLE map RESTART IDENTITY CASCADE');
             }
         } catch (\Exception $e) {
             $connection->executeStatement('DELETE FROM user');
+            $connection->executeStatement('DELETE FROM map');
         }
     }
 
@@ -84,11 +91,13 @@ class RegistrationDatabaseTest extends WebTestCase
         $userData = [
             'email' => 'database.test@example.com',
             'password' => 'SecurePassword123!',
-            'pseudo' => 'DatabaseTestUser'
+            'pseudo' => 'DatabaseTestUser',
+            'mapName' => 'Ma première map'
         ];
 
-        // Compter le nombre d'utilisateurs au départ
+        // Compter le nombre d'utilisateurs et de maps au départ
         $initialUserCount = $this->entityManager->getRepository(User::class)->count([]);
+        $initialMapCount = $this->entityManager->getRepository(Map::class)->count([]);
 
         // Envoyer la requête POST
         $this->client->request(
@@ -105,11 +114,19 @@ class RegistrationDatabaseTest extends WebTestCase
 
         $responseData = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('user_id', $responseData);
+        $this->assertArrayHasKey('map_id', $responseData);
+        $this->assertArrayHasKey('map_name', $responseData);
         $userId = $responseData['user_id'];
+        $mapId = $responseData['map_id'];
+        
+        // Vérifier que le nom de la map dans la réponse correspond
+        $this->assertEquals($userData['mapName'], $responseData['map_name'], 'Le nom de la map dans la réponse devrait être correct');
 
-        // Vérifier qu'un utilisateur a bien été ajouté en base
+        // Vérifier qu'un utilisateur et une map ont bien été ajoutés en base
         $finalUserCount = $this->entityManager->getRepository(User::class)->count([]);
+        $finalMapCount = $this->entityManager->getRepository(Map::class)->count([]);
         $this->assertEquals($initialUserCount + 1, $finalUserCount, 'Un utilisateur devrait avoir été ajouté en base');
+        $this->assertEquals($initialMapCount + 1, $finalMapCount, 'Une map devrait avoir été ajoutée en base');
 
         // Récupérer l'utilisateur depuis la base de données
         $savedUser = $this->entityManager->getRepository(User::class)->find($userId);
@@ -138,6 +155,18 @@ class RegistrationDatabaseTest extends WebTestCase
         $this->assertEquals(10, $savedUser->getXp(), 'L\'utilisateur devrait avoir 10 XP par défaut');
         $this->assertEquals('500.00', $savedUser->getMoney(), 'L\'utilisateur devrait avoir 500.00 d\'argent par défaut');
         $this->assertEquals(150, $savedUser->getNrj(), 'L\'utilisateur devrait avoir 150 d\'énergie par défaut');
+        
+        // Vérifications pour la Map associée
+        $this->assertNotNull($savedUser->getMap(), 'L\'utilisateur devrait avoir une map associée');
+        $this->assertInstanceOf(Map::class, $savedUser->getMap(), 'La map devrait être une instance de Map');
+        $this->assertEquals($userData['mapName'], $savedUser->getMap()->getName(), 'Le nom de la map devrait correspondre');
+        $this->assertEquals($savedUser, $savedUser->getMap()->getUser(), 'La relation bidirectionnelle devrait être correcte');
+        
+        // Vérifier que la map a bien été créée en base
+        $mapRepository = $this->entityManager->getRepository(Map::class);
+        $savedMap = $mapRepository->findOneBy(['user' => $savedUser]);
+        $this->assertNotNull($savedMap, 'La map devrait exister en base de données');
+        $this->assertEquals($userData['mapName'], $savedMap->getName(), 'Le nom de la map en base devrait être correct');
     }
 
     public function testMultipleUsersDataPersistence(): void
@@ -146,17 +175,20 @@ class RegistrationDatabaseTest extends WebTestCase
             [
                 'email' => 'user1@example.com',
                 'password' => 'Password123!',
-                'pseudo' => 'User1'
+                'pseudo' => 'User1',
+                'mapName' => 'Map utilisateur 1'
             ],
             [
                 'email' => 'user2@example.com',
                 'password' => 'Password456!',
-                'pseudo' => 'User2'
+                'pseudo' => 'User2',
+                'mapName' => 'Map utilisateur 2'
             ],
             [
                 'email' => 'user3@example.com',
                 'password' => 'Password789!',
-                'pseudo' => 'User3'
+                'pseudo' => 'User3',
+                'mapName' => 'Map utilisateur 3'
             ]
         ];
 
@@ -177,6 +209,9 @@ class RegistrationDatabaseTest extends WebTestCase
             $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
 
             $responseData = json_decode($response->getContent(), true);
+            $this->assertArrayHasKey('user_id', $responseData);
+            $this->assertArrayHasKey('map_id', $responseData);
+            $this->assertArrayHasKey('map_name', $responseData);
             $userIds[] = $responseData['user_id'];
         }
 
@@ -195,6 +230,10 @@ class RegistrationDatabaseTest extends WebTestCase
             // Vérifier l'unicité des IDs
             $this->assertIsInt($savedUser->getId());
             $this->assertGreaterThan(0, $savedUser->getId());
+            
+            // Vérifier que la map est créée et associée
+            $this->assertNotNull($savedUser->getMap(), "L'utilisateur {$index} devrait avoir une map");
+            $this->assertEquals($expectedUser['mapName'], $savedUser->getMap()->getName(), "Le nom de la map de l'utilisateur {$index} devrait être correct");
         }
 
         // Vérifier que les emails de ce test sont uniques
@@ -210,7 +249,8 @@ class RegistrationDatabaseTest extends WebTestCase
         $userData = [
             'email' => 'integrity.test@example.com',
             'password' => 'IntegrityTest123!',
-            'pseudo' => 'IntegrityUser'
+            'pseudo' => 'IntegrityUser',
+            'mapName' => 'Map de test intégrité'
         ];
 
         // Créer l'utilisateur
@@ -261,7 +301,8 @@ class RegistrationDatabaseTest extends WebTestCase
         $userData = [
             'email' => 'constraint.test@example.com',
             'password' => 'ConstraintTest123!',
-            'pseudo' => 'ConstraintUser'
+            'pseudo' => 'ConstraintUser',
+            'mapName' => 'Map contraintes test'
         ];
 
         // Créer le premier utilisateur
@@ -281,7 +322,8 @@ class RegistrationDatabaseTest extends WebTestCase
         $duplicateUserData = [
             'email' => 'constraint.test@example.com', // Même email
             'password' => 'DifferentPassword123!',
-            'pseudo' => 'DifferentUser'
+            'pseudo' => 'DifferentUser',
+            'mapName' => 'Map duplicate test'
         ];
 
         $this->client->request(
@@ -313,7 +355,8 @@ class RegistrationDatabaseTest extends WebTestCase
         $invalidUserData = [
             'email' => 'invalid-email', // Email invalide
             'password' => '', // Mot de passe vide
-            'pseudo' => '' // Pseudo vide
+            'pseudo' => '', // Pseudo vide
+            'mapName' => '' // Map name vide
         ];
 
         // Compter les utilisateurs avant le test
@@ -342,7 +385,8 @@ class RegistrationDatabaseTest extends WebTestCase
         $userData = [
             'email' => 'defaults.test@example.com',
             'password' => 'DefaultsTest123!',
-            'pseudo' => 'DefaultsUser'
+            'pseudo' => 'DefaultsUser',
+            'mapName' => 'Map valeurs par défaut'
         ];
 
         // Créer l'utilisateur
@@ -378,5 +422,9 @@ class RegistrationDatabaseTest extends WebTestCase
         // Vérifier que le mot de passe est bien hashé
         $isPasswordValid = $this->passwordHasher->isPasswordValid($savedUser, $userData['password']);
         $this->assertTrue($isPasswordValid, 'Le mot de passe devrait être correctement hashé');
+        
+        // Vérifier que la map a été créée avec les bonnes valeurs par défaut
+        $this->assertNotNull($savedUser->getMap(), 'L\'utilisateur devrait avoir une map associée');
+        $this->assertEquals($userData['mapName'], $savedUser->getMap()->getName(), 'Le nom de la map devrait être correct');
     }
 }

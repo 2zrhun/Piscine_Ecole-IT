@@ -58,6 +58,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?int $nrj = null;
 
+    #[ORM\OneToOne(targetEntity: Map::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Map $map = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -183,6 +186,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setNrj(?int $nrj): static
     {
         $this->nrj = $nrj;
+
+        return $this;
+    }
+
+    public function getMap(): ?Map
+    {
+        return $this->map;
+    }
+
+    public function setMap(?Map $map): static
+    {
+        $this->map = $map;
+
+        // Set the owning side of the relation if necessary
+        if ($map !== null && $map->getUser() !== $this) {
+            $map->setUser($this);
+        }
 
         return $this;
     }
