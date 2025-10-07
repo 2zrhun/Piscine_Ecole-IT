@@ -92,6 +92,12 @@ class RegistrationControllerTest extends WebTestCase
         $this->assertArrayHasKey('user_id', $responseData);
         $this->assertEquals('Utilisateur créé avec succès', $responseData['message']);
         $this->assertIsInt($responseData['user_id']);
+        
+        // Vérifier que l'utilisateur a les bonnes valeurs par défaut dès la réponse
+        $user = $this->entityManager->getRepository(User::class)->find($responseData['user_id']);
+        $this->assertEquals(10, $user->getXp(), 'L\'XP par défaut devrait être 10');
+        $this->assertEquals('500.00', $user->getMoney(), 'L\'argent par défaut devrait être 500.00');
+        $this->assertEquals(150, $user->getNrj(), 'L\'énergie par défaut devrait être 150');
 
         // Vérifier que l'utilisateur a bien été créé en base
         $user = $this->entityManager->getRepository(User::class)->find($responseData['user_id']);
@@ -102,6 +108,11 @@ class RegistrationControllerTest extends WebTestCase
         // Vérifier que le mot de passe a été hashé
         $this->assertNotEquals($userData['password'], $user->getPassword());
         $this->assertNotEmpty($user->getPassword());
+        
+        // Vérifier les valeurs par défaut ajoutées dans le contrôleur
+        $this->assertEquals(10, $user->getXp(), 'L\'utilisateur devrait avoir 10 XP par défaut');
+        $this->assertEquals('500.00', $user->getMoney(), 'L\'utilisateur devrait avoir 500.00 d\'argent par défaut');  
+        $this->assertEquals(150, $user->getNrj(), 'L\'utilisateur devrait avoir 150 d\'énergie par défaut');
     }
 
     public function testMissingEmailField(): void
