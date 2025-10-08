@@ -52,8 +52,4 @@ volumes:
 
 networks:
   citybuilder_net:
-<<<<<<< HEAD
     driver: bridge
-=======
-    driver: bridge
->>>>>>> websocket

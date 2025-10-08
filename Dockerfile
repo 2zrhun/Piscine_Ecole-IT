@@ -39,3 +39,4 @@ RUN mkdir -p var && chown -R www-data:www-data var
 EXPOSE 80
 
 CMD ["apache2-foreground"]
+
