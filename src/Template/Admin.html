@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .admin-header {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-iframe {
+            width: 100%;
+            height: calc(100vh - 60px);
+            border: none;
+        }
+        .back-btn {
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .back-btn:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <h1>🛠️ Administration</h1>
+        <a href="/src/Template/Game.html" class="back-btn">← Retour au jeu</a>
+    </div>
+    <iframe 
+        src="http://localhost:8000/admin" 
+        class="admin-iframe"
+        title="Panel d'administration">
+    </iframe>
+
+    <script type="module" src="../script/auth-guard.js"></script>
+    <script>
+        // Protéger la page admin
+        if (typeof protectPage !== 'undefined') {
+            protectPage();
+        }
+    </script>
+</body>
+</html>
