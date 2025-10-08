@@ -103,6 +103,19 @@ async register(userData) {
 }
 
 /**
+ * Récupération des informations de l'utilisateur connecté
+ */
+async getCurrentUser() {
+    try {
+        return await this.makeRequest('/user/profile', {
+            method: 'GET'
+        });
+    } catch (error) {
+        throw new Error('Erreur de récupération du profil: ' + error.message);
+    }
+}
+
+/**
  * Déconnexion
  */
 logout() {
