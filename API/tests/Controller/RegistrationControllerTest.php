@@ -85,8 +85,8 @@ class RegistrationControllerTest extends WebTestCase
         $userData = [
             'email' => 'test@example.com',
             'password' => 'MotDePasse123!',
-            'pseudo' => 'TestUser',
-            'mapName' => 'Ma ville test'
+            'pseudo' => 'TestUserSuccess',
+            'mapName' => 'Ma ville success'
         ];
 
         $this->client->request(
@@ -109,7 +109,7 @@ class RegistrationControllerTest extends WebTestCase
         $this->assertEquals('Utilisateur et map créés avec succès', $responseData['message']);
         $this->assertIsInt($responseData['user_id']);
         $this->assertIsInt($responseData['map_id']);
-        $this->assertEquals('Ma ville test', $responseData['map_name']);
+        $this->assertEquals('Ma ville success', $responseData['map_name']);
         
         // Vérifier que l'utilisateur a les bonnes valeurs par défaut dès la réponse
         $user = $this->entityManager->getRepository(User::class)->find($responseData['user_id']);
@@ -119,7 +119,7 @@ class RegistrationControllerTest extends WebTestCase
         
         // Vérifier que la map a été créée et liée
         $this->assertNotNull($user->getMap(), 'L\'utilisateur devrait avoir une map');
-        $this->assertEquals('Ma ville test', $user->getMap()->getName(), 'Le nom de la map devrait correspondre');
+        $this->assertEquals('Ma ville success', $user->getMap()->getName(), 'Le nom de la map devrait correspondre');
 
         // Vérifier que l'utilisateur a bien été créé en base
         $user = $this->entityManager->getRepository(User::class)->find($responseData['user_id']);
@@ -141,8 +141,8 @@ class RegistrationControllerTest extends WebTestCase
     {
         $userData = [
             'password' => 'MotDePasse123!',
-            'pseudo' => 'TestUser',
-            'mapName' => 'Ma ville test'
+            'pseudo' => 'TestUserMissing',
+            'mapName' => 'VilleTest'
         ];
 
         $this->client->request(
@@ -166,8 +166,8 @@ class RegistrationControllerTest extends WebTestCase
     {
         $userData = [
             'email' => 'test@example.com',
-            'pseudo' => 'TestUser',
-            'mapName' => 'Ma ville test'
+            'pseudo' => 'TestUserMissing',
+            'mapName' => 'VilleTest'
         ];
 
         $this->client->request(
@@ -192,7 +192,7 @@ class RegistrationControllerTest extends WebTestCase
         $userData = [
             'email' => 'test@example.com',
             'password' => 'MotDePasse123!',
-            'mapName' => 'Ma ville test'
+            'mapName' => 'VilleTest'
         ];
 
         $this->client->request(
@@ -238,7 +238,7 @@ class RegistrationControllerTest extends WebTestCase
         $userData = [
             'email' => 'test@example.com',
             'password' => 'MotDePasse123!',
-            'pseudo' => 'TestUser'
+            'pseudo' => 'TestUserMissing'
         ];
 
         $this->client->request(
@@ -263,8 +263,8 @@ class RegistrationControllerTest extends WebTestCase
         $userData = [
             'email' => 'email-invalide',
             'password' => 'MotDePasse123!',
-            'pseudo' => 'TestUser',
-            'mapName' => 'Ma ville test'
+            'pseudo' => 'TestUserMissing',
+            'mapName' => 'VilleTest'
         ];
 
         $this->client->request(
@@ -314,7 +314,7 @@ class RegistrationControllerTest extends WebTestCase
             'email' => 'existing@example.com',
             'password' => 'MotDePasse123!',
             'pseudo' => 'NewUser',
-            'mapName' => 'Ma ville test'
+            'mapName' => 'VilleTest'
         ];
 
         $this->client->request(
@@ -336,6 +336,110 @@ class RegistrationControllerTest extends WebTestCase
         
         // Vérifier que le message d'erreur contient bien l'information sur l'email dupliqué
         $this->assertContains('Cet email est déjà utilisé.', $responseData['details']);
+    }
+
+    public function testDuplicatePseudo(): void
+    {
+        // Créer d'abord un utilisateur via l'API
+        $firstUserData = [
+            'email' => 'user1@example.com',
+            'password' => 'MotDePasse123!',
+            'pseudo' => 'UniquePseudo',
+            'mapName' => 'Ville Unique'
+        ];
+
+        $this->client->request(
+            'POST',
+            '/api/register',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode($firstUserData)
+        );
+
+        // Vérifier que le premier utilisateur a été créé avec succès
+        $firstResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_CREATED, $firstResponse->getStatusCode());
+
+        // Tenter de créer un autre utilisateur avec le même pseudo
+        $secondUserData = [
+            'email' => 'user2@example.com',
+            'password' => 'MotDePasse123!',
+            'pseudo' => 'UniquePseudo', // Même pseudo
+            'mapName' => 'Autre Ville'
+        ];
+
+        $this->client->request(
+            'POST',
+            '/api/register',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode($secondUserData)
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+
+        $responseData = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('error', $responseData);
+        $this->assertEquals('Erreurs de validation', $responseData['error']);
+        $this->assertArrayHasKey('details', $responseData);
+        
+        // Vérifier que le message d'erreur contient bien l'information sur le pseudo dupliqué
+        $this->assertContains('Ce pseudo est déjà utilisé.', $responseData['details']);
+    }
+
+    public function testDuplicateMapName(): void
+    {
+        // Créer d'abord un utilisateur avec une ville via l'API
+        $firstUserData = [
+            'email' => 'ville1@example.com',
+            'password' => 'MotDePasse123!',
+            'pseudo' => 'Maire1',
+            'mapName' => 'VilleUnique'
+        ];
+
+        $this->client->request(
+            'POST',
+            '/api/register',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode($firstUserData)
+        );
+
+        // Vérifier que le premier utilisateur a été créé avec succès
+        $firstResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_CREATED, $firstResponse->getStatusCode());
+
+        // Tenter de créer un autre utilisateur avec le même nom de ville
+        $secondUserData = [
+            'email' => 'ville2@example.com',
+            'password' => 'MotDePasse123!',
+            'pseudo' => 'Maire2',
+            'mapName' => 'VilleUnique' // Même nom de ville
+        ];
+
+        $this->client->request(
+            'POST',
+            '/api/register',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode($secondUserData)
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+
+        $responseData = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('error', $responseData);
+        $this->assertEquals('Erreurs de validation', $responseData['error']);
+        $this->assertArrayHasKey('details', $responseData);
+        
+        // Vérifier que le message d'erreur contient bien l'information sur le nom de ville dupliqué
+        $this->assertContains('Ce nom de ville est déjà utilisé.', $responseData['details']);
     }
 
     public function testEmptyStringFields(): void
@@ -389,7 +493,7 @@ class RegistrationControllerTest extends WebTestCase
     public function testRegistrationWithSpecialCharacters(): void
     {
         $userData = [
-            'email' => 'test+special' . uniqid() . '@example.com',
+            'email' => 'test+special' . '@example.com',
             'password' => 'P@ssw0rd!123',
             'pseudo' => 'User_123-Test',
             'mapName' => 'Ville-Test_123'
