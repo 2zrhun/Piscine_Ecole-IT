@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: citybuilder
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+    environment:
+      APP_ENV: prod
+      DATABASE_URL: "mysql://symfony:symfony@db:3306/citybuilder_db?serverVersion=8.0"
+    volumes:
+      - .:/var/www/html
+      - symfony_var:/var/www/html/var
+    networks:
+      - citybuilder_net
+
+  db:
+    image: mysql:8.0
+    container_name: citybuilder_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: citybuilder_db
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - citybuilder_net
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: citybuilder_phpmyadmin
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "8081:80"
+    networks:
+      - citybuilder_net
+
+volumes:
+  db_data:
+  symfony_var:
+
+networks:
+  citybuilder_net:
+    driver: bridge
