@@ -1,4 +1,4 @@
-FROM php:8.2-apache AS builder
+FROM php:8.3-apache
 
 RUN apt-get update && apt-get install -y \
     git \
@@ -19,9 +19,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN a2enmod rewrite headers
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-COPY API/composer.json API/composer.lock ./
+COPY API .
 
 RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-scripts
 
@@ -31,18 +29,12 @@ COPY API/.env .env
 ENV APP_ENV=prod
 
 
-RUN php bin/console cache:clear --env=prod --no-debug || true \
- && php bin/console cache:warmup --env=prod || true
-
-FROM php:8.2-apache
+RUN php bin/console cache:clear --env=prod --no-debug \
+ && php bin/console cache:warmup --env=prod
 
 RUN a2enmod rewrite headers
 
-COPY --from=builder /var/www/html /var/www/html
-
-WORKDIR /var/www/html
-
-RUN mkdir -p var && chown -R www-data:www-data var || true
+RUN mkdir -p var && chown -R www-data:www-data var
 
 EXPOSE 80
 
