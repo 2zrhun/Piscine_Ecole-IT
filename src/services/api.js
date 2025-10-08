@@ -118,10 +118,25 @@ async getCurrentUser() {
 /**
  * Déconnexion
  */
-logout() {
+async logout() {
+    try {
+        // Appeler la route logout du backend
+        await this.makeRequest('/logout', {
+            method: 'POST'
+        });
+        console.log('✅ Déconnexion côté serveur réussie');
+    } catch (error) {
+        console.warn('⚠️ Erreur lors de la déconnexion côté serveur:', error);
+        // On continue la déconnexion même en cas d'erreur serveur
+    }
+    
+    // Nettoyage côté client (toujours fait)
     this.token = null;
     localStorage.removeItem('auth_token');
-    console.log('Utilisateur déconnecté');
+    console.log('🚪 Utilisateur déconnecté localement');
+    
+    // Redirection vers la page de login
+    window.location.href = '/src/Template/Login.html';
 }
 
 /**
