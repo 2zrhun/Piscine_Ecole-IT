@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: citybuilder-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: citybuilder
+  template:
+    metadata:
+      labels:
+        app: citybuilder
+    spec:
+      containers:
+      - name: nginx
+        image: citybuild/ecoleit:1.0
+        ports:
+        - containerPort: 80
