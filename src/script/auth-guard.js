@@ -4,7 +4,7 @@ import apiService from '../services/api.js';
  * Vérifie si l'utilisateur est authentifié si nécessaire
  * @param {string} redirectUrl - URL de redirection si non authentifié
  */
-export async function checkAuthentication(redirectUrl = 'src/Template/Login.html') {
+export async function checkAuthentication(redirectUrl = '/index.html') {
     console.log("🔒 Vérification de l'authentification...");
 
     //  Vérifier si un token existe
