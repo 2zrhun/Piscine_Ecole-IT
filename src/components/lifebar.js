@@ -13,7 +13,7 @@ export function createEnergyBlock(energy = 50, money = 100, xp = 10, pseudo = 'u
     statsBlock.innerHTML = `
         <div style="margin-bottom: 3px; font-size: 24px;">👾 ${pseudo}</div>
         <div>⚡ ${energy} | 💰 ${money} | 🎓 ${xp}</div>
-        <div>
+        <div id="buttons-container">
             <button id="logout-button" style="
                 background: #ff4444; 
                 color: white; 
@@ -22,6 +22,7 @@ export function createEnergyBlock(energy = 50, money = 100, xp = 10, pseudo = 'u
                 border-radius: 3px; 
                 font-size: 11px; 
                 cursor: pointer;
+                margin-right: 5px;
             ">Déconnexion</button>
         </div>
     `;
@@ -164,6 +165,7 @@ export async function initLifebarWithUser(energy = 50, money = 100, xp = 10) {
     const { default: apiService } = await import('../services/api.js');
     
     let userPseudo = 'user'; // Valeur par défaut
+    let isAdmin = false;
     
     try {
         // Vérifier si l'utilisateur est connecté
@@ -173,7 +175,9 @@ export async function initLifebarWithUser(energy = 50, money = 100, xp = 10) {
             
             if (user && user.pseudo) {
                 userPseudo = user.pseudo;
-                console.log('✅ Pseudo récupéré:', userPseudo);
+                // Vérifier si l'utilisateur est admin
+                isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
+                console.log('✅ Pseudo récupéré:', userPseudo, isAdmin ? '(Admin)' : '');
             } else {
                 console.warn('⚠️ Pas de pseudo trouvé, utilisation de "user"');
             }
@@ -186,5 +190,34 @@ export async function initLifebarWithUser(energy = 50, money = 100, xp = 10) {
     }
     
     // Créer la lifebar avec le pseudo récupéré
-    return createEnergyBlock(energy, money, xp, userPseudo);
+    const lifebar = createEnergyBlock(energy, money, xp, userPseudo);
+    
+    // Ajouter le bouton Admin si l'utilisateur est admin
+    if (isAdmin) {
+        const buttonsContainer = lifebar.querySelector('#buttons-container');
+        if (buttonsContainer) {
+            const adminButton = document.createElement('button');
+            adminButton.id = 'admin-button';
+            adminButton.textContent = 'Admin';
+            adminButton.style.cssText = `
+                background: #4CAF50; 
+                color: white; 
+                border: none; 
+                padding: 2px 6px; 
+                border-radius: 3px; 
+                font-size: 11px; 
+                cursor: pointer;
+                margin-right: 5px;
+            `;
+            adminButton.onclick = () => {
+                window.location.href = '/src/Template/Admin.html';
+            };
+            
+            // Insérer avant le bouton de déconnexion
+            const logoutButton = buttonsContainer.querySelector('#logout-button');
+            buttonsContainer.insertBefore(adminButton, logoutButton);
+        }
+    }
+    
+    return lifebar;
 }
