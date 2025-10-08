@@ -66,7 +66,7 @@ form.addEventListener('submit', async (e) => {
 
         // ⏱️ Redirection après 1.5 seconde
         setTimeout(() => {
-            window.location.href = "./src/Template/Game.html";
+            window.location.href = "../../../index.html";
         }, 1500);
 
     } catch (error) {

@@ -4,7 +4,7 @@
 class ApiService {
     constructor() {
         // URL de base de l'API
-        this.baseUrl = 'http://localhost:8000/api';
+        this.baseUrl = 'http://localhost:8080/api';
         // Récupération du token depuis le localStorage
         this.token = localStorage.getItem('auth_token');
     }
