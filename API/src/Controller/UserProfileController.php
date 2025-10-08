@@ -26,7 +26,8 @@ class UserProfileController extends AbstractController
             'email' => $user->getEmail(),
             'xp' => $user->getXp(),
             'money' => $user->getMoney(),
-            'nrj' => $user->getNrj()
+            'nrj' => $user->getNrj(),
+            'roles' => $user->getRoles()
         ]);
     }
 }
