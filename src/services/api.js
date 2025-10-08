@@ -64,6 +64,32 @@ class ApiService {
 /**
  * Connexion utilisateur
  */
+async login(credentials) {
+    try {
+        const response = await this.makeRequest('/login_check', {
+           method: 'POST',
+           body: JSON.stringify({
+            username: credentials.email,
+            password: credentials.password
+           }),
+           includeAuth: false
+        });
+
+        // Stockage du token si la connexion est réussit
+        if (response && response.token) {
+            this.token = response.token;
+            localStorage.setItem('auth_token', this.token);
+            console.log('Connexion réussie, token stocké');
+        }
+        return response;
+    } catch (error) {
+        throw new Error('Erreur de connexion: '+ error.message);
+    }
+}
+
+/**
+ * Inscription d'un nouvel utilisateur
+ */
 async register(userData) {
     try {
         return await this.makeRequest('/register', {
@@ -73,6 +99,19 @@ async register(userData) {
         });
     } catch (error) {
         throw new Error('Erreur d\'inscription: ' + error.message);
+    }
+}
+
+/**
+ * Récupération des informations de l'utilisateur connecté
+ */
+async getCurrentUser() {
+    try {
+        return await this.makeRequest('/user/profile', {
+            method: 'GET'
+        });
+    } catch (error) {
+        throw new Error('Erreur de récupération du profil: ' + error.message);
     }
 }
 
