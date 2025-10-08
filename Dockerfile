@@ -34,9 +34,6 @@ RUN php bin/console cache:clear --env=prod --no-debug || true \
 
 FROM php:8.2-apache
 
-COPY apache/vhost.conf /etc/apache2/sites-available/000-default.conf
-
-
 RUN a2enmod rewrite headers
 
 COPY --from=builder /var/www/html /var/www/html
