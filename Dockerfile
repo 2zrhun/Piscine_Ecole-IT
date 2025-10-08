@@ -34,8 +34,7 @@ RUN php bin/console cache:clear --env=prod --no-debug || true \
 
 FROM php:8.2-apache
 
-COPY apache/vhost.conf /etc/apache2/sites-available/000-default.conf
-
+COPY apache/vhost.conf /etc/apache2/sites-available/Piscine_Ecole-IT.conf
 
 RUN a2enmod rewrite headers
 
