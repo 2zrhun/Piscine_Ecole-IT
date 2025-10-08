@@ -1,6 +1,7 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
+<<<<<<< HEAD
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Piscine_Ecole-IT website</title>
@@ -44,18 +45,37 @@
     /* hover speeds wag */
     #catCanvas:hover { cursor: pointer; opacity: 0.98; }
   </style>
+=======
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./src/style/login.css">
+    <title>Connection</title>
+>>>>>>> websocket
 </head>
 <body>
-  <main class="page" role="main">
-    <header class="header-row">
-      <h1>salut les copains</h1>
-      <!-- WebGL canvas for the animated cat -->
-      <canvas id="catCanvas" width="192" height="192" aria-hidden="true" title="Animated cat (WebGL)"></canvas>
-    </header>
+<form class="login" id="loginForm">
+    <h2>Connection</h2>
 
+<<<<<<< HEAD
     <p>This is the landing page of <strong>piscineVal1</strong>. The cat to the right is drawn with WebGL and animated (hover to speed the tail).</p>
   </main>
 
   
+=======
+    <label for="email">Email :</label>
+    <input type="email" id="email" name="email" placeholder="exemple@mail.com" required>
+
+    <label for="password">Mot de passe :</label>
+    <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+
+    <p id="errorMessage" class="error"></p>
+
+    <button type="submit">Se connecter</button>
+
+    <div class="Separateur"></div>
+    <a href="./src/Template/Register.html" class="lienLogin">Inscrivez-vous ?</a>
+</form>
+<script type="module" src="./src/script/login.js"></script>
+>>>>>>> websocket
 </body>
 </html>
