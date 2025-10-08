@@ -19,11 +19,15 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN a2enmod rewrite headers
 
-WORKDIR /var/www/html/Piscine_Ecole-IT
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 COPY API/composer.json API/composer.lock ./
 
 RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-scripts
+
+RUN composer install
+
+RUN composer --version
 
 COPY API/.env .env
 ENV APP_ENV=prod
