@@ -25,8 +25,6 @@ COPY API/composer.json API/composer.lock ./
 
 RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-scripts
 
-RUN composer install
-
 RUN composer --version
 
 COPY API/.env .env
