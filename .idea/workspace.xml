@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="362c861b-dd1d-401f-9763-3f974d475165" name="Changes" comment="" />
+    <list default="true" id="362c861b-dd1d-401f-9763-3f974d475165" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Deployment.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Deployment.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -47,10 +51,11 @@
   "keyToString": {
     "DefaultHtmlFileTemplate": "HTML File",
     "Docker.Dockerfile.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "Front",
+    "git-widget-placeholder": "Docker-files",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/creve/Documents/ecole-it/piscine/src/assets",
     "list.type.of.created.stylesheet": "CSS",
@@ -86,7 +91,9 @@
       <method v="2" />
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
-      <deployment type="docker-compose.yml" />
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
       <method v="2" />
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
@@ -141,6 +148,7 @@
       <workItem from="1759833092062" duration="10879000" />
       <workItem from="1759859888658" duration="2052000" />
       <workItem from="1759907033351" duration="1901000" />
+      <workItem from="1759926400195" duration="318000" />
     </task>
     <servers />
   </component>
