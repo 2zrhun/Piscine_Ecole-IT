@@ -13,6 +13,17 @@ export function createEnergyBlock(energy = 50, money = 100, xp = 10, pseudo = 'u
     statsBlock.innerHTML = `
         <div style="margin-bottom: 3px; font-size: 24px;">👾 ${pseudo}</div>
         <div>⚡ ${energy} | 💰 ${money} | 🎓 ${xp}</div>
+        <div>
+            <button id="logout-button" style="
+                background: #ff4444; 
+                color: white; 
+                border: none; 
+                padding: 2px 6px; 
+                border-radius: 3px; 
+                font-size: 11px; 
+                cursor: pointer;
+            ">Déconnexion</button>
+        </div>
     `;
     
     // Style simple
@@ -26,6 +37,18 @@ export function createEnergyBlock(energy = 50, money = 100, xp = 10, pseudo = 'u
         font-family: Arial, sans-serif;
         font-size: 14px;
     `;
+
+    // Ajout de l'écouteur d'événement pour le bouton logout
+    setTimeout(() => {
+        const logoutBtn = document.getElementById('logout-button');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                // Import dynamique pour éviter les dépendances circulaires
+                const {default: apiService }= await import ('../services/api.js');
+                await apiService.logout();
+            });
+        }
+    }, 0);
     
     // Ajouter au body
     document.body.appendChild(statsBlock);
@@ -44,7 +67,29 @@ export function updateStats(statsBlock, energy, money, xp, pseudo = 'user') {
     statsBlock.innerHTML = `
         <div style="margin-bottom: 3px; font-size: 12px;">👾 ${pseudo}</div>
         <div>⚡ ${energy} | 💰 ${money} | 🎓 ${xp}</div>
+        <div>
+            <button id="logout-button" style="
+                background: #ff4444; 
+                color: white; 
+                border: none; 
+                padding: 2px 6px; 
+                border-radius: 3px; 
+                font-size: 11px; 
+                cursor: pointer;
+            ">Déconnexion</button>
+        </div>
     `;
+    
+    // Réattacher l'écouteur d'événement
+    setTimeout(() => {
+        const logoutBtn = document.getElementById('logout-button');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                const {default: apiService} = await import('../services/api.js');
+                await apiService.logout();
+            });
+        }
+    }, 0);
 }
 
 /**
