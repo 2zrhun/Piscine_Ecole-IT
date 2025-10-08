@@ -136,7 +136,7 @@ async logout() {
     console.log('🚪 Utilisateur déconnecté localement');
     
     // Redirection vers la page de login
-    window.location.href = '/src/Template/Login.html';
+    window.location.href = '/index.html';
 }
 
 /**
