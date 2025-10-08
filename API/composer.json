@@ -12,7 +12,13 @@
         "doctrine/doctrine-bundle": "^2.16.2",
         "doctrine/doctrine-migrations-bundle": "^3.4.2",
         "doctrine/orm": "^3.5.2",
+<<<<<<< HEAD
         "lexik/jwt-authentication-bundle": "^3.1.1",
+=======
+        "easycorp/easyadmin-bundle": "^4.26.2",
+        "lexik/jwt-authentication-bundle": "^3.1.1",
+        "nelmio/cors-bundle": "^2.5",
+>>>>>>> 1c4b7009d67d13c4be88c8c36f30763bc4540ac3
         "symfony/console": "7.3.*",
         "symfony/dotenv": "7.3.*",
         "symfony/flex": "^2.8.2",

@@ -52,4 +52,8 @@ volumes:
 
 networks:
   citybuilder_net:
+<<<<<<< HEAD
     driver: bridge
+=======
+    driver: bridge
+>>>>>>> 1c4b7009d67d13c4be88c8c36f30763bc4540ac3

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Map;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,9 +24,9 @@ class RegistrationController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         // Vérifier que les données requises sont présentes
-        if (!isset($data['email']) || !isset($data['password']) || !isset($data['pseudo'])) {
+        if (!isset($data['email']) || !isset($data['password']) || !isset($data['pseudo']) || !isset($data['mapName'])) {
             return new JsonResponse([
-                'error' => 'Email, password et pseudo sont requis'
+                'error' => 'Email, password, pseudo et mapName sont requis'
             ], 400);
         }
 
@@ -33,32 +34,50 @@ class RegistrationController extends AbstractController
         $user = new User();
         $user->setEmail($data['email']);
         $user->setPseudo($data['pseudo']);
+        $user->setRoles(['ROLE_USER']); // Rôle par défaut
+        $user->setXp(10);
+        $user->setMoney('500.00');
+        $user->setNrj(150);
         
         // Hasher le mot de passe
         $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
         $user->setPassword($hashedPassword);
 
-        // Valider l'utilisateur
-        $errors = $validator->validate($user);
-        if (count($errors) > 0) {
-            $errorMessages = [];
-            foreach ($errors as $error) {
-                $errorMessages[] = $error->getMessage();
-            }
+        // Créer la map pour l'utilisateur
+        $map = new Map();
+        $map->setName($data['mapName']);
+        $map->setUser($user);
+        $user->setMap($map);
+
+        // Valider l'utilisateur et la map
+        $userErrors = $validator->validate($user);
+        $mapErrors = $validator->validate($map);
+        
+        $allErrors = [];
+        foreach ($userErrors as $error) {
+            $allErrors[] = $error->getMessage();
+        }
+        foreach ($mapErrors as $error) {
+            $allErrors[] = $error->getMessage();
+        }
+        
+        if (count($allErrors) > 0) {
             return new JsonResponse([
                 'error' => 'Erreurs de validation',
-                'details' => $errorMessages
+                'details' => $allErrors
             ], 400);
         }
 
         try {
-            // Sauvegarder en base de données
+            // Sauvegarder en base de données (la map sera sauvegardée automatiquement grâce au cascade)
             $entityManager->persist($user);
             $entityManager->flush();
 
             return new JsonResponse([
-                'message' => 'Utilisateur créé avec succès',
-                'user_id' => $user->getId()
+                'message' => 'Utilisateur et map créés avec succès',
+                'user_id' => $user->getId(),
+                'map_id' => $map->getId(),
+                'map_name' => $map->getName()
             ], 201);
 
         } catch (\Exception $e) {

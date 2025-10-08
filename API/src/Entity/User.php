@@ -9,10 +9,32 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_PSEUDO', fields: ['pseudo'])]
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')]
+#[UniqueEntity(fields: ['pseudo'], message: 'Ce pseudo est déjà utilisé.')]
+#[ApiResource(
+    operations: [
+        new Get(
+            security: "is_granted('ROLE_USER') and object == user"
+        ),
+        new GetCollection(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
+        new Put(
+            security: "is_granted('ROLE_USER') and object == user"
+        )
+        ],
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:write']]
+)]
+
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -24,6 +46,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank(message: "L'email ne peut pas être vide")]
     #[Assert\Email(message: "L'email n'est pas valide")]
     #[Assert\Length(max: 180, maxMessage: "L'email ne peut pas dépasser {{ limit }} caractères")]
+    #[Assert\Regex(
+        pattern: '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+        message: "L'email doit respecter le format : exemple@domaine.com"
+    )]
     private ?string $email = null;
 
     /**
@@ -37,6 +63,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide")]
+    #[Assert\Regex(
+        pattern: "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).{6,}$/",
+        message: "Le mot de passe doit contenir au moins 6 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial parmis !@#$%^&*()-_=+{};:,<.>"
+    )]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
@@ -57,6 +87,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     private ?int $nrj = null;
+
+    #[ORM\OneToOne(targetEntity: Map::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Map $map = null;
 
     public function getId(): ?int
     {
@@ -183,6 +216,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setNrj(?int $nrj): static
     {
         $this->nrj = $nrj;
+
+        return $this;
+    }
+
+    public function getMap(): ?Map
+    {
+        return $this->map;
+    }
+
+    public function setMap(?Map $map): static
+    {
+        $this->map = $map;
+
+        // Set the owning side of the relation if necessary
+        if ($map !== null && $map->getUser() !== $this) {
+            $map->setUser($this);
+        }
 
         return $this;
     }
