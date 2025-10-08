@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: citybuilder-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+
+    nginx.ingress.kubernetes.io/websocket-services: "citybuilder-service"
+
+
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+
+
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: citybuilder.local
+      http:
+        paths:
+          # Front
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: citybuilder-frontend-service
+                port:
+                  number: 80
+
+          # API 
+          - path: C:\Users\2zrhun\Desktop\Piscine_Ecole-IT\API
+            pathType: Prefix
+            backend:
+              service:
+                name: citybuilder-backend-service
+                port:
+                  number: 80
+
+  # tls:
+  #   - hosts:
+  #       - citybuilder.local
+  #     secretName: citybuilder-tls
