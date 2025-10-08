@@ -20,15 +20,15 @@ class LoginControllerTest extends WebTestCase
         $this->entityManager = $this->client->getContainer()->get('doctrine')->getManager();
         $this->passwordHasher = $this->client->getContainer()->get(UserPasswordHasherInterface::class);
         
-        // Nettoyer la base de données avant chaque test
-        $this->cleanDatabase();
+        // NE PAS nettoyer automatiquement - les données s'accumuleront
+        // $this->cleanDatabase(); // ← Commenté pour garder les données
     }
 
     protected function tearDown(): void
     {
-        // Nettoyer après chaque test
+        // NE PAS nettoyer après les tests pour garder les données
         if ($this->entityManager && $this->entityManager->getConnection()->isConnected()) {
-            $this->cleanDatabase();
+            // $this->cleanDatabase(); // ← Commenté pour garder les données
             $this->entityManager->clear();
             $this->entityManager->close();
         }
