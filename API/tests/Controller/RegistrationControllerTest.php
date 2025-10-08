@@ -84,7 +84,7 @@ class RegistrationControllerTest extends WebTestCase
     {
         $userData = [
             'email' => 'test@example.com',
-            'password' => 'motdepasse123',
+            'password' => 'MotDePasse123!',
             'pseudo' => 'TestUser',
             'mapName' => 'Ma ville test'
         ];
@@ -140,7 +140,7 @@ class RegistrationControllerTest extends WebTestCase
     public function testMissingEmailField(): void
     {
         $userData = [
-            'password' => 'motdepasse123',
+            'password' => 'MotDePasse123!',
             'pseudo' => 'TestUser',
             'mapName' => 'Ma ville test'
         ];
@@ -191,7 +191,7 @@ class RegistrationControllerTest extends WebTestCase
     {
         $userData = [
             'email' => 'test@example.com',
-            'password' => 'motdepasse123',
+            'password' => 'MotDePasse123!',
             'mapName' => 'Ma ville test'
         ];
 
@@ -237,7 +237,7 @@ class RegistrationControllerTest extends WebTestCase
     {
         $userData = [
             'email' => 'test@example.com',
-            'password' => 'motdepasse123',
+            'password' => 'MotDePasse123!',
             'pseudo' => 'TestUser'
         ];
 
@@ -262,7 +262,7 @@ class RegistrationControllerTest extends WebTestCase
     {
         $userData = [
             'email' => 'email-invalide',
-            'password' => 'motdepasse123',
+            'password' => 'MotDePasse123!',
             'pseudo' => 'TestUser',
             'mapName' => 'Ma ville test'
         ];
@@ -291,7 +291,7 @@ class RegistrationControllerTest extends WebTestCase
         // Créer d'abord un utilisateur via l'API
         $firstUserData = [
             'email' => 'existing@example.com',
-            'password' => 'motdepasse123',
+            'password' => 'MotDePasse123!',
             'pseudo' => 'ExistingUser',
             'mapName' => 'Ville existante'
         ];
@@ -312,7 +312,7 @@ class RegistrationControllerTest extends WebTestCase
         // Tenter de créer un autre utilisateur avec le même email
         $secondUserData = [
             'email' => 'existing@example.com',
-            'password' => 'motdepasse123',
+            'password' => 'MotDePasse123!',
             'pseudo' => 'NewUser',
             'mapName' => 'Ma ville test'
         ];
