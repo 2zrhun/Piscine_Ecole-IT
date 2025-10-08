@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Piscine_Ecole-IT website</title>
+  <script src="/JS/cat.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: #fff;
+      color: #111;
+      display: flex;
+      justify-content: center;
+      padding: 48px 16px;
+    }
+    .page {
+      max-width: 900px;
+      width: 100%;
+    }
+    .header-row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2.25rem;
+    }
+
+    /* canvas size next to the title */
+    #catCanvas {
+      width: 96px;
+      height: 96px;
+      flex: 0 0 96px;
+      border-radius: 10px;
+      background: transparent;
+      display: block;
+    }
+
+    p { line-height: 1.55; margin-top: 18px; font-size: 1rem; }
+    strong { color: #0b72d0; }
+    /* hover speeds wag */
+    #catCanvas:hover { cursor: pointer; opacity: 0.98; }
+  </style>
+</head>
+<body>
+  <main class="page" role="main">
+    <header class="header-row">
+      <h1>salut les copains</h1>
+      <!-- WebGL canvas for the animated cat -->
+      <canvas id="catCanvas" width="192" height="192" aria-hidden="true" title="Animated cat (WebGL)"></canvas>
+    </header>
+
+    <p>This is the landing page of <strong>piscineVal1</strong>. The cat to the right is drawn with WebGL and animated (hover to speed the tail).</p>
+  </main>
+
+  
+</body>
+</html>
