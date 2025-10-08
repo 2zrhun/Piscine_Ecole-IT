@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -13,6 +14,8 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
 
 #[ORM\Entity]
+#[ORM\UniqueConstraint(name: 'UNIQ_MAP_NAME', fields: ['name'])]
+#[UniqueEntity(fields: ['name'], message: 'Ce nom de ville est déjà utilisé.')]
 #[ApiResource(
     operations: [
         new Get(
