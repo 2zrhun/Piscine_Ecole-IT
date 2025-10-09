@@ -37,6 +37,11 @@ class BuildingCrudController extends AbstractCrudController
                 ->setUploadDir('public/uploads/building')
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
                 ->onlyOnIndex(),
+
+            ImageField::new('image')
+                ->setBasePath('http://localhost:8000/uploads/imageBuilding')
+                ->setUploadDir('public/uploads/imageBuilding')
+                ->setUploadedFileNamePattern('[randomhash].[extension]')
         ];
     }
 }
