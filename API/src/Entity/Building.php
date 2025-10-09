@@ -7,8 +7,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BuildingRepository::class)]
+#[ApiResource(
+    normalizationContext: ['groups' => ['building:read']]
+)]
 #[Vich\Uploadable]
 class Building
 {
@@ -18,9 +23,11 @@ class Building
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['building:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['building:read'])]
     private ?string $file = null;
 
     #[Vich\UploadableField(mapping: 'building_images', fileNameProperty: 'file')]
@@ -47,6 +54,7 @@ class Building
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['building:read'])]
     private ?string $image = null;
 
     public function getId(): ?int
