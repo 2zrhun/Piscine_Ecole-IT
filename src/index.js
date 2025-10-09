@@ -10,6 +10,7 @@ import {createSquareBuilder} from "./script/Game/squareCreateBuilder";
 const sizeGrid = 50;
 const divisionGrid = 52;
 
+// Création de la case pour la création des batiments
 createSquareBuilder({
     size: 100,
     borderWidth: 3,
@@ -26,17 +27,15 @@ const camera = createCamera();
 const renderer = createRenderer();
 const controls = createControls(camera, renderer);
 
-// Grille
 const { cellules, gridValues } = createColoredGrid(sizeGrid, divisionGrid);
 cellules.forEach(cell => scene.add(cell));
 
 const plane = createPlane(sizeGrid);
 scene.add(plane);
 
-// Routes
 const routes = gridValues.filter(c => c.value === 1);
 
-// PNJ
+// Création des PNJ
 const colors = ['red', 'blue', 'yellow', 'purple','red', 'blue', 'yellow', 'purple','red', 'blue', 'yellow', 'purple'];
 const pnjs = colors.map(color => new PNJ(scene, routes, color, sizeGrid / divisionGrid, 0.02));
 

@@ -6,7 +6,6 @@ export class PNJ {
         this.step = step;
         this.speed = speed;
 
-        // Case de départ aléatoire
         const start = this.routes[Math.floor(Math.random() * this.routes.length)];
 
         const geometry = new THREE.SphereGeometry(step * 0.3, 16, 16);
@@ -26,11 +25,11 @@ export class PNJ {
             if (!this.targetCell) return;
         }
 
-        const targetPos = new THREE.Vector3(this.targetCell.x, this.mesh.position.y, this.targetCell.z);
-        const dir = new THREE.Vector3().subVectors(targetPos, this.mesh.position);
-        const dist = dir.length();
+        const prochainePosition = new THREE.Vector3(this.targetCell.x, this.mesh.position.y, this.targetCell.z);
+        const dir = new THREE.Vector3().subVectors(prochainePosition, this.mesh.position);
+        const distance = dir.length();
 
-        if (dist < 0.05) {
+        if (distance < 0.05) {
             this.previousCell = this.currentCell;
             this.currentCell = this.targetCell;
             this.targetCell = this.getNextCell();
@@ -41,13 +40,13 @@ export class PNJ {
     }
 
     getNextCell() {
-        const neighbors = [
+        const posVoisin = [
             { x: this.currentCell.x + this.step, z: this.currentCell.z },
             { x: this.currentCell.x - this.step, z: this.currentCell.z },
             { x: this.currentCell.x, z: this.currentCell.z + this.step },
             { x: this.currentCell.x, z: this.currentCell.z - this.step },
         ];
-        let valid = neighbors.map(n =>
+        let valid = posVoisin.map(n =>
             this.routes.find(r => Math.abs(r.x - n.x) < this.step / 2 && Math.abs(r.z - n.z) < this.step / 2)
         ).filter(Boolean);
 

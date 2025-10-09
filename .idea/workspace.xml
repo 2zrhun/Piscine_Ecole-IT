@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="02e2efdd-6710-4b25-8bdd-ec803e82601c" name="Changes" comment="" />
+    <list default="true" id="02e2efdd-6710-4b25-8bdd-ec803e82601c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/script/Game/grid.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/script/Game/grid.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/script/Game/pnj.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/script/Game/pnj.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -56,7 +61,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Docker-files&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;FrontV2&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/creve/Documents/ecole-it/piscine/src/assets&quot;,
     &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
@@ -151,6 +156,7 @@
       <workItem from="1759907033351" duration="1901000" />
       <workItem from="1759926400195" duration="318000" />
       <workItem from="1759993927899" duration="21552000" />
+      <workItem from="1760030659059" duration="2034000" />
     </task>
     <servers />
   </component>

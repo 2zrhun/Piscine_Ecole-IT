@@ -14,9 +14,9 @@ export function createColoredGrid(sizeGrid, divisionGrid) {
     for (let i = -sizeGrid / 2; i < sizeGrid / 2; i += step) {
         let verticalIndex = 0;
         for (let j = -sizeGrid / 2; j < sizeGrid / 2; j += step) {
-            const posRow = horizontalIndex % tracage;
-            const posCol = verticalIndex % tracage;
-            const isRoute = (posRow < routeSize || posCol < routeSize);
+            const posLigne = horizontalIndex % tracage;
+            const posCololone = verticalIndex % tracage;
+            const isRoute = (posLigne < routeSize || posCololone < routeSize);
             const color = isRoute ? 'gray' : 'green';
 
             const cellule = createCellule(i, j, color, step);
