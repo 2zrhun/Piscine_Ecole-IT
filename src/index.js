@@ -6,48 +6,18 @@ import { createGrid } from './script/Game/grid.js';
 import { createColoredGrid } from './script/Game/grid.js';
 import { createPlane } from './script/Game/plane.js';
 import { initLifebarWithUser } from './components/lifebar.js';
-import { saveMapConfig } from './services/api.js';
-import { getMapConfig } from './services/api.js';
 import BuildingGallery from './components/BuildingGallery.js';
+import BuildingBar from './components/BuildingBar.js';
 
 window.addEventListener('DOMContentLoaded', () => {
-    // Affichage dynamique de la galerie des buildings
-    const galleryBar = document.createElement('div');
-    galleryBar.id = 'building-gallery-bar';
-    galleryBar.style.display = 'flex';
-    galleryBar.style.gap = '10px';
-    galleryBar.style.margin = '20px 0';
-    galleryBar.style.overflowX = 'auto';
-    document.body.appendChild(galleryBar);
-
-    fetch('http://localhost:8000/api/buildings/images')
-        .then(response => response.json())
-        .then(buildings => {
-            buildings.forEach(building => {
-                const img = document.createElement('img');
-                img.src = building.image;
-                img.alt = building.name;
-                img.title = building.name;
-                img.style.width = '80px';
-                img.style.height = '80px';
-                img.style.objectFit = 'cover';
-                img.style.borderRadius = '8px';
-                img.style.cursor = 'pointer';
-                img.addEventListener('click', () => {
-                    // Action au clic : charger le modèle 3D ou autre
-                    if (building.file) {
-                        loadBuildingModel(building.file);
-                    }
-                });
-                galleryBar.appendChild(img);
-            });
-        })
-        .catch(err => {
-            const errorMsg = document.createElement('p');
-            errorMsg.textContent = 'Erreur chargement des buildings: ' + err;
-            errorMsg.style.color = 'red';
-            galleryBar.appendChild(errorMsg);
-        });
+    // Instanciation de la barre des buildings en haut à gauche
+    new BuildingBar('building-bar', function(building) {
+        // Action au clic sur un building (ex: charger le modèle 3D)
+        console.log('Building sélectionné:', building);
+        if (building.file) {
+            loadBuildingModel(building.file);
+        }
+    });
     // Récupérer le token depuis le localStorage
     const token = localStorage.getItem('auth_token');
 

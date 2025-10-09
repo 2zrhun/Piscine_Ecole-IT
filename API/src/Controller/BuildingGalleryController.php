@@ -9,19 +9,19 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class BuildingGalleryController extends AbstractController
 {
-    /**
-     * @Route("/api/buildings/images", name="api_buildings_images", methods={"GET"})
-     */
+    #[Route('/gallery/buildings/images', name: 'gallery_buildings_images', methods: ['GET'])]
     public function getBuildingsImages(BuildingRepository $buildingRepository): JsonResponse
     {
         $buildings = $buildingRepository->findAll();
         $result = [];
         foreach ($buildings as $building) {
+            $imageFile = $building->getImage(); // nom du fichier en BDD
+            $imageUrl = $imageFile ? 'http://localhost:8000/uploads/imageBuilding/' . $imageFile : null;
             $result[] = [
                 'id' => $building->getId(),
                 'name' => $building->getName(),
-                'image' => $building->getImage(), // à adapter selon ta propriété
-                'file' => $building->getFile(),   // si tu veux aussi le fichier 3D
+                'image' => $imageUrl,
+                'file' => $building->getFile(),
             ];
         }
         return new JsonResponse($result);
