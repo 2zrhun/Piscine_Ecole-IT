@@ -56,6 +56,12 @@ jobs:
             sleep 1
           done
 
+      - name: Prepare database
+        run: |
+            cd API
+            php bin/console doctrine:database:drop --force --if-exists --env=test
+            php bin/console doctrine:database:create --env=test
+
       - name: Run migrations
         run: cd API && php bin/console doctrine:migrations:migrate --no-interaction
 
