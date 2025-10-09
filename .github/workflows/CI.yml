@@ -43,8 +43,8 @@ jobs:
       - name: Install Composer dependencies
         run: cd API && composer install --no-interaction --prefer-dist
 
-      - name: Security Check
-        uses: symfonycorp/security-checker-action@v5
+      - name: Composer Security Audit
+        run: cd API && composer audit
 
       - name: Copy .env.test
         run: cp API/.env.test API/.env
