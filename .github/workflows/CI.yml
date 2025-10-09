@@ -62,7 +62,7 @@ jobs:
             php API/bin/console doctrine:database:create --env=test
 
       - name: Run migrations
-        run: cd API && php bin/console doctrine:migrations:migrate --no-interaction
+        run: cd API && php API/bin/console doctrine:migrations:migrate --no-interaction
 
       - name: Run tests
-        run: cd API && php bin/phpunit
+        run: cd API && php API/bin/phpunit
