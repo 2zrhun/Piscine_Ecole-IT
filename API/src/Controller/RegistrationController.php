@@ -50,6 +50,32 @@ class RegistrationController extends AbstractController
         foreach ($userErrors as $error) {
             $allErrors[] = $error->getMessage();
         }
+
+        // Créer la map pour l'utilisateur
+        $defaultConfig = [
+            'grid' => ['size' => 50, 'division' => 20],
+            'elements' => []
+        ];
+
+        // Générer une couleur aléatoire au format hexadécimal
+        $randomColor = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
+
+        $map = new Map();
+        $map->setName($data['mapName']);
+        $map->setUser($user);
+        $map->setConfig($defaultConfig);
+        $map->setColor($randomColor);
+
+        // Mettre à jour la relation bidirectionnelle
+        $user->setMap($map);
+
+        // Valider la map AVANT de persister
+        $mapErrors = $validator->validate($map);
+        foreach ($mapErrors as $error) {
+            $allErrors[] = $error->getMessage();
+        }
+
+        // Si des erreurs de validation existent (user ou map), retourner une erreur
         if (count($allErrors) > 0) {
             return new JsonResponse([
                 'error' => 'Erreurs de validation',
@@ -57,34 +83,10 @@ class RegistrationController extends AbstractController
             ], 400);
         }
 
-        // Persister l'utilisateur
+        // Persister l'utilisateur ET la map en une seule transaction
         $entityManager->persist($user);
-        $entityManager->flush();
-
-        // Créer la map pour l'utilisateur
-        $defaultConfig = [
-            'grid' => ['size' => 50, 'division' => 20],
-            'elements' => []
-        ];
-        $map = new Map();
-        $map->setName($data['mapName']);
-        $map->setUser($user);
-        $map->setConfig($defaultConfig);
         $entityManager->persist($map);
         $entityManager->flush();
-
-        // Valider la map
-        $mapErrors = $validator->validate($map);
-        $mapErrorList = [];
-        foreach ($mapErrors as $error) {
-            $mapErrorList[] = $error->getMessage();
-        }
-        if (count($mapErrorList) > 0) {
-            return new JsonResponse([
-                'error' => 'Erreurs de validation map',
-                'details' => $mapErrorList
-            ], 400);
-        }
 
         return new JsonResponse([
             'message' => 'Utilisateur et map créés avec succès',

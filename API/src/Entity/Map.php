@@ -70,6 +70,10 @@ class Map
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $config = null;
 
+    #[ORM\Column(length: 7, nullable: true)]
+    #[Groups(['map:read'])]
+    private ?string $color = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -131,6 +135,17 @@ class Map
     public function setConfig(?array $config): static
     {
         $this->config = $config;
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): static
+    {
+        $this->color = $color;
         return $this;
     }
 }

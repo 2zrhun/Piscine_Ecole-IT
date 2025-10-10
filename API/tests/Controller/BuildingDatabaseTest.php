@@ -52,12 +52,13 @@ class BuildingDatabaseTest extends WebTestCase
     {
         // Compter le nombre de buildings au départ
         $initialCount = $this->entityManager->getRepository(Building::class)->count([]);
-        
+
         // Créer un nouveau building
         $building = new Building();
         $building->setName('Hôtel de Ville');
         $building->setFile('hotel_ville.jpg');
-        
+        $building->setImage('hotel_ville.jpg');
+
         // Persister en base
         $this->entityManager->persist($building);
         $this->entityManager->flush();
@@ -84,15 +85,16 @@ class BuildingDatabaseTest extends WebTestCase
             ['name' => 'Bibliothèque', 'file' => 'bibliotheque.jpg'],
             ['name' => 'Parc', 'file' => 'parc.gif'],
         ];
-        
+
         $initialCount = $this->entityManager->getRepository(Building::class)->count([]);
-        
+
         // Créer et sauvegarder plusieurs buildings
         foreach ($buildings as $buildingData) {
             $building = new Building();
             $building->setName($buildingData['name']);
             $building->setFile($buildingData['file']);
-            
+            $building->setImage($buildingData['file']);
+
             $this->entityManager->persist($building);
         }
         
@@ -119,7 +121,8 @@ class BuildingDatabaseTest extends WebTestCase
         $building = new Building();
         $building->setName('Ancien Nom');
         $building->setFile('ancien_fichier.jpg');
-        
+        $building->setImage('ancien_fichier.jpg');
+
         $this->entityManager->persist($building);
         $this->entityManager->flush();
         
@@ -146,7 +149,8 @@ class BuildingDatabaseTest extends WebTestCase
         $building = new Building();
         $building->setName('Building à supprimer');
         $building->setFile('delete_me.jpg');
-        
+        $building->setImage('delete_me.jpg');
+
         $this->entityManager->persist($building);
         $this->entityManager->flush();
         
@@ -172,11 +176,13 @@ class BuildingDatabaseTest extends WebTestCase
         $building1 = new Building();
         $building1->setName('Building 1');
         $building1->setFile('building1.jpg');
-        
+        $building1->setImage('building1.jpg');
+
         $building2 = new Building();
         $building2->setName('Building 2');
         $building2->setFile('building2.jpg');
-        
+        $building2->setImage('building2.jpg');
+
         $this->entityManager->persist($building1);
         $this->entityManager->persist($building2);
         
@@ -194,7 +200,8 @@ class BuildingDatabaseTest extends WebTestCase
         $building = new Building();
         $building->setName('Test Intégrité');
         $building->setFile('test_integrite.jpg');
-        
+        $building->setImage('test_integrite.jpg');
+
         $this->entityManager->persist($building);
         $this->entityManager->flush();
         

@@ -8,109 +8,208 @@ import { createPlane } from './script/Game/plane.js';
 import { initLifebarWithUser } from './components/lifebar.js';
 import BuildingGallery from './components/BuildingGallery.js';
 import BuildingBar from './components/BuildingBar.js';
+import MapVisitor from './components/MapVisitor.js';
+import MapIndicator from './components/MapIndicator.js';
+import socketService from './services/socketService.js';
+
+// Variables globales pour la carte actuelle
+let currentScene = null;
+let currentCamera = null;
+let currentRenderer = null;
+let currentControls = null;
+let currentUserPseudo = null;
+let mapIndicator = null;
 
 window.addEventListener('DOMContentLoaded', () => {
+    // Récupérer le token depuis le localStorage
+    const token = localStorage.getItem('auth_token');
+
+    if (!token) {
+        alert('Token manquant. Veuillez vous reconnecter.');
+        return;
+    }
+
+    // Connecter Socket.io pour le multijoueur
+    socketService.connect('http://localhost:3001');
+
+    // Initialiser l'indicateur de carte
+    mapIndicator = new MapIndicator();
+
     // Instanciation de la barre des buildings en haut à gauche
     new BuildingBar('building-bar', function(building) {
-        // Action au clic sur un building (ex: charger le modèle 3D)
         console.log('Building sélectionné:', building);
         if (building.file) {
             loadBuildingModel(building.file);
         }
     });
-    // Récupérer le token depuis le localStorage
-    const token = localStorage.getItem('auth_token');
 
     // Afficher la galerie
-    const gallery = new BuildingGallery('gallery', function(building) {
+    new BuildingGallery('gallery', function(building) {
         console.log('Building sélectionné:', building);
         loadBuildingModel(building.file);
     });
 
-    // Récupérer directement la map de l'utilisateur connecté
-    if (token) {
-        fetch('http://localhost:8000/api/user/map', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+    // Instanciation du panneau de visite de carte
+    const mapVisitor = new MapVisitor('map-visitor', (config, ownerPseudo, mapId, mapName, mapColor) => {
+        console.log(`🗺️ Chargement de la carte de ${ownerPseudo} avec la couleur ${mapColor || 'par défaut'}`);
+
+        // Quitter la carte actuelle si on en visite une
+        if (currentUserPseudo && socketService.isConnected()) {
+            socketService.leaveMap();
+        }
+
+        // Charger la nouvelle carte avec sa couleur
+        setupMapFromConfig(config, ownerPseudo, mapColor);
+
+        // Mettre à jour l'indicateur de carte
+        const isOwnMap = ownerPseudo === currentUserPseudo;
+        mapIndicator.show(ownerPseudo, mapName, isOwnMap);
+
+        // Rejoindre la carte via Socket.io
+        if (socketService.isConnected()) {
+            const visitorPseudo = currentUserPseudo || 'Visiteur';
+            socketService.visitMap(mapId, mapName, ownerPseudo, visitorPseudo);
+        }
+    });
+
+    // Configuration des événements Socket.io
+    socketService.on('playerJoined', (data) => {
+        console.log('👤 Nouveau visiteur a rejoint la carte:', data.visitor.pseudo);
+        // Ne rien faire ici, on attend l'événement 'currentVisitors'
+    });
+
+    socketService.on('playerLeft', (data) => {
+        console.log('🚪 Visiteur parti:', data.pseudo);
+        // Ne rien faire ici, on attend l'événement 'currentVisitors'
+    });
+
+    socketService.on('currentVisitors', (data) => {
+        console.log('📋 Mise à jour des visiteurs actuels:', data.visitors);
+        mapVisitor.updateVisitorsList(data.visitors);
+    });
+
+    socketService.on('mapChanged', (data) => {
+        console.log('🔨 Carte modifiée par:', data.updatedBy);
+        // Ici vous pouvez ajouter la logique pour afficher les modifications en temps réel
+    });
+
+    // Récupérer la map de l'utilisateur connecté au démarrage
+    fetch('http://localhost:8000/api/user/map', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+        const config = data.config;
+        if (!config) {
+            alert('Aucune configuration de map trouvée pour cet utilisateur.');
+            return;
+        }
+
+        // Récupérer le pseudo de l'utilisateur
+        return fetch('http://localhost:8000/api/user/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert(data.error);
-                return;
+        .then(res => res.json())
+        .then(userData => {
+            currentUserPseudo = userData.pseudo || 'Joueur';
+
+            // Charger sa propre carte avec sa couleur
+            setupMapFromConfig(config, currentUserPseudo, data.color);
+
+            // Afficher l'indicateur de sa propre carte
+            mapIndicator.show(currentUserPseudo, data.name, true);
+
+            // Rejoindre sa propre carte via Socket.io
+            if (socketService.isConnected()) {
+                socketService.visitMap(data.id, data.name, currentUserPseudo, currentUserPseudo);
             }
-            const config = data.config;
-            if (!config) {
-                alert('Aucune configuration de map trouvée pour cet utilisateur.');
-                return;
-            }
-            // Reconstruire la map avec la config reçue
-            setupMapFromConfig(config);
-        })
-        .catch(err => {
-            alert('Erreur récupération map: ' + err);
         });
-    } else {
-        alert('Token manquant. Veuillez vous reconnecter.');
-    }
+    })
+    .catch(err => {
+        console.error('Erreur récupération map:', err);
+        alert('Erreur récupération map: ' + err);
+    });
 });
 
 
 function loadBuildingModel(fileName) {
+    if (!currentScene) {
+        console.error('❌ Scene non initialisée');
+        return;
+    }
+
     const loader = new THREE.GLTFLoader();
     loader.load(`/uploads/building/${fileName}`, function(gltf) {
-        scene.add(gltf.scene);
+        currentScene.add(gltf.scene);
+
+        // Notifier les autres visiteurs de l'ajout
+        if (socketService.isConnected()) {
+            socketService.sendMapUpdate('addBuilding', { fileName }, gltf.scene.position);
+        }
     }, undefined, function(error) {
         console.error('Erreur chargement modèle 3D:', error);
     });
 }
 
 // Fonction pour reconstruire la map à partir de la config reçue
-function setupMapFromConfig(config) {
+function setupMapFromConfig(config, ownerPseudo = 'Joueur', mapColor = '#CFDBD5') {
+    // Nettoyer l'ancienne scène si elle existe
+    if (currentRenderer) {
+        currentRenderer.domElement.remove();
+    }
+
     // Paramètres de la map
     const sizeGrid = config.grid.size;
     const divisionGrid = config.grid.division;
 
     // Création de la map
-    const scene = createMap();
-    const camera = createCamera();
-    const renderer = createRenderer();
-    const controls = createControls(camera, renderer);
+    currentScene = createMap();
+    currentCamera = createCamera();
+    currentRenderer = createRenderer();
+    currentControls = createControls(currentCamera, currentRenderer);
 
     // Ajout de la grille et du plane
-    scene.add(createGrid(sizeGrid, divisionGrid));
+    currentScene.add(createGrid(sizeGrid, divisionGrid));
     const plane = createPlane(sizeGrid);
-    scene.add(plane);
+    currentScene.add(plane);
 
     // Ajouter la couleur de la maps
-    const coloredCells = createColoredGrid(sizeGrid, divisionGrid);
-    coloredCells.forEach(cell => scene.add(cell));
+    const coloredCells = createColoredGrid(sizeGrid, divisionGrid, mapColor);
+    coloredCells.forEach(cell => currentScene.add(cell));
 
     // Ajouter les éléments personnalisés
     if (Array.isArray(config.elements)) {
-        config.elements.forEach(el => {
+        config.elements.forEach(() => {
             // Exemple: ajouter un cube ou une sphère selon le type
-            // ... à compléter selon ta logique d'affichage
+            // ... à compléter selon votre logique d'affichage
         });
     }
 
-    // Créer le bloc d'affichage avec le pseudo de l'utilisateur connecté
+    // Créer le bloc d'affichage avec le pseudo du propriétaire de la carte
     initLifebarWithUser(50, 100, 10);
 
+    console.log(`✅ Carte de "${ownerPseudo}" chargée (${sizeGrid}x${sizeGrid})`);
+
     // Redimension
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+    const resizeHandler = () => {
+        currentCamera.aspect = window.innerWidth / window.innerHeight;
+        currentCamera.updateProjectionMatrix();
+        currentRenderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', resizeHandler);
 
     // Animation
     function animate() {
         requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
+        currentControls.update();
+        currentRenderer.render(currentScene, currentCamera);
     }
     animate();
 }

@@ -392,12 +392,15 @@ class RegistrationControllerTest extends WebTestCase
 
     public function testDuplicateMapName(): void
     {
+        // Utiliser un nom unique pour ce test pour éviter les conflits entre exécutions
+        $uniqueMapName = 'VilleUnique_' . uniqid();
+
         // Créer d'abord un utilisateur avec une ville via l'API
         $firstUserData = [
-            'email' => 'ville1@example.com',
+            'email' => 'ville1_' . uniqid() . '@example.com',
             'password' => 'MotDePasse123!',
-            'pseudo' => 'Maire1',
-            'mapName' => 'VilleUnique'
+            'pseudo' => 'Maire1_' . uniqid(),
+            'mapName' => $uniqueMapName
         ];
 
         $this->client->request(
@@ -415,10 +418,10 @@ class RegistrationControllerTest extends WebTestCase
 
         // Tenter de créer un autre utilisateur avec le même nom de ville
         $secondUserData = [
-            'email' => 'ville2@example.com',
+            'email' => 'ville2_' . uniqid() . '@example.com',
             'password' => 'MotDePasse123!',
-            'pseudo' => 'Maire2',
-            'mapName' => 'VilleUnique' // Même nom de ville
+            'pseudo' => 'Maire2_' . uniqid(),
+            'mapName' => $uniqueMapName // Même nom de ville
         ];
 
         $this->client->request(

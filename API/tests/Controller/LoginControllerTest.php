@@ -63,8 +63,13 @@ class LoginControllerTest extends WebTestCase
         }
     }
 
-    private function createTestUser(string $email = 'test@example.com', string $password = 'password123', string $pseudo = 'TestUser'): User
+    private function createTestUser(string $email = 'test@example.com', string $password = 'password123', string $pseudo = null): User
     {
+        // Si aucun pseudo n'est fourni, générer un pseudo unique
+        if ($pseudo === null) {
+            $pseudo = 'TestUser_' . uniqid();
+        }
+
         $user = new User();
         $user->setEmail($email);
         $user->setPseudo($pseudo);
@@ -72,7 +77,7 @@ class LoginControllerTest extends WebTestCase
         $user->setXp(10);
         $user->setMoney('500.00');
         $user->setNrj(150);
-        
+
         // Hasher le mot de passe
         $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
         $user->setPassword($hashedPassword);

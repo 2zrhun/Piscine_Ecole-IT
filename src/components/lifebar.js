@@ -27,16 +27,17 @@ export function createEnergyBlock(energy = 50, money = 100, xp = 10, pseudo = 'u
         </div>
     `;
     
-    // Style simple
+    // Style simple - positionné en haut à gauche pour ne pas chevaucher le MapVisitor
     statsBlock.style.cssText = `
         position: fixed;
         top: 10px;
-        right: 10px;
+        left: 10px;
         background: #fff;
         border: 1px solid #ccc;
         padding: 5px 10px;
         font-family: Arial, sans-serif;
         font-size: 14px;
+        z-index: 1001;
     `;
 
     // Ajout de l'écouteur d'événement pour le bouton logout
