@@ -24,15 +24,17 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash && \
 
 RUN a2enmod rewrite headers
 
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm
+
 COPY API /var/www/html
 
 RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-scripts
 
-# Configure Apache DocumentRoot to public/
 RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf && \
     sed -ri -e 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Set proper permissions
 RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 755 /var/www/html
 
@@ -43,5 +45,8 @@ ENV APP_ENV=prod
 RUN mkdir -p var && chown -R www-data:www-data var
 
 EXPOSE 80
+EXPOSE 3000 
+
+RUN npm install
 
 CMD ["apache2-foreground"]
