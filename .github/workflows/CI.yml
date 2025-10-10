@@ -19,6 +19,8 @@ jobs:
         env:
           MYSQL_DATABASE: citybuilder_db
           MYSQL_ROOT_PASSWORD: root
+          MYSQL_USER: user
+          MYSQL_PASSWORD: pass
         ports:
           - 3306:3306
         options: >-
@@ -47,10 +49,6 @@ jobs:
       - name: Copy .env.test
         run: cp API/.env.test API/.env
 
-      - name: Configure database
-        run: |
-          echo "DATABASE_URL=mysql://root:root@127.0.0.1:3306/citybuilder_db?serverVersion=8.0&charset=utf8mb4" >> API/.env
-
       - name: Wait for MySQL
         run: |
           for i in {1..30}; do
@@ -58,8 +56,17 @@ jobs:
             sleep 1
           done
 
-      - name: Run migrations
-        run: cd API && php bin/console doctrine:migrations:migrate --no-interaction 
+      - name: Prepare database
+        run: |
+            php API/bin/console doctrine:database:drop --force --if-exists --env=test
+            php API/bin/console doctrine:database:create --env=test
+
+      - name: Run database migrations
+        run: |
+            cd API
+            php bin/console doctrine:database:create --if-not-exists --no-interaction
+            php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing
+
 
       - name: Run tests
-        run: cd API && php bin/phpunit
+        run:  php API/bin/phpunit
