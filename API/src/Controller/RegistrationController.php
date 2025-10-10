@@ -50,16 +50,6 @@ class RegistrationController extends AbstractController
         foreach ($userErrors as $error) {
             $allErrors[] = $error->getMessage();
         }
-        if (count($allErrors) > 0) {
-            return new JsonResponse([
-                'error' => 'Erreurs de validation',
-                'details' => $allErrors
-            ], 400);
-        }
-
-        // Persister l'utilisateur
-        $entityManager->persist($user);
-        $entityManager->flush();
 
         // Créer la map pour l'utilisateur
         $defaultConfig = [
@@ -75,21 +65,28 @@ class RegistrationController extends AbstractController
         $map->setUser($user);
         $map->setConfig($defaultConfig);
         $map->setColor($randomColor);
-        $entityManager->persist($map);
-        $entityManager->flush();
 
-        // Valider la map
+        // Mettre à jour la relation bidirectionnelle
+        $user->setMap($map);
+
+        // Valider la map AVANT de persister
         $mapErrors = $validator->validate($map);
-        $mapErrorList = [];
         foreach ($mapErrors as $error) {
-            $mapErrorList[] = $error->getMessage();
+            $allErrors[] = $error->getMessage();
         }
-        if (count($mapErrorList) > 0) {
+
+        // Si des erreurs de validation existent (user ou map), retourner une erreur
+        if (count($allErrors) > 0) {
             return new JsonResponse([
-                'error' => 'Erreurs de validation map',
-                'details' => $mapErrorList
+                'error' => 'Erreurs de validation',
+                'details' => $allErrors
             ], 400);
         }
+
+        // Persister l'utilisateur ET la map en une seule transaction
+        $entityManager->persist($user);
+        $entityManager->persist($map);
+        $entityManager->flush();
 
         return new JsonResponse([
             'message' => 'Utilisateur et map créés avec succès',
