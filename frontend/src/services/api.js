@@ -147,6 +147,28 @@ isAuthenticated() {
 }
 }
 
+export async function saveMapConfig(mapId, config, token) {
+    const response = await fetch(`http://localhost:8000/api/maps/${mapId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization' : `Bearer ${token}`
+        },
+        body: JSON.stringify({ config })
+    });
+    return response.json();
+}
+
+export async function getMapConfig(mapId, token) {
+    const response = await fetch(`http://localhost:8000/api/maps/${mapId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization' : `Bearer ${token}`
+        }
+        })
+        return response.json();
+}
+
 // Instance globale exportée
 const apiService = new ApiService();
 export default apiService;

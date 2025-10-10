@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
+        BACKEND_IMAGE = "mydockerhubuser/citybuilder-backend:latest"
+        FRONTEND_IMAGE = "mydockerhubuser/citybuilder-frontend:latest"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps { checkout scm }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-creds') {
+                        def backend = docker.build("${BACKEND_IMAGE}", "./api")
+                        backend.push()
+                        def frontend = docker.build("${FRONTEND_IMAGE}", "./frontend")
+                        frontend.push()
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success { echo 'Docker images built and pushed ' }
+        failure { echo 'Docker build failed ' }
+    }
+}

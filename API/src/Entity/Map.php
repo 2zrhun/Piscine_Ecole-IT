@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity]
 #[ORM\UniqueConstraint(name: 'UNIQ_MAP_NAME', fields: ['name'])]
@@ -37,6 +38,7 @@ use ApiPlatform\Metadata\Delete;
     normalizationContext: ['groups' => ['map:read']],
     denormalizationContext: ['groups' => ['map:write']]
 )]
+#[Groups(['map:read', 'map:write'])]
 class Map
 {
     #[ORM\Id]
@@ -56,6 +58,7 @@ class Map
         minMessage: "Le nom de la map doit contenir au moins {{ limit }} caractères",
         maxMessage: "Le nom de la map ne peut pas dépasser {{ limit }} caractères"
     )]
+
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -63,6 +66,9 @@ class Map
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $config = null;
 
     public function __construct()
     {
@@ -115,6 +121,16 @@ class Map
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    public function getConfig(): ?array{
+        return $this->config;
+    }
+
+    public function setConfig(?array $config): static
+    {
+        $this->config = $config;
         return $this;
     }
 }
