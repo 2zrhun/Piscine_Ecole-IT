@@ -118,6 +118,19 @@ Piscine_Ecole-IT/
 
 ---
 
+## 📈 Bilan actuel de la CI
+
+⚠️ CI partiellement fonctionnelle  
+✅ Compatible PHP 8.3  
+⚠️ Certains jobs (migrations base de données / tests) nécessitent encore des ajustements  
+⚠️ Pipeline en cours d’optimisation pour atteindre un état stable  
+
+---
+
+💡 **Conclusion**  
+Cette version de CI/CD fournit une **base de travail solide**, mais certains aspects, notamment la gestion de la base MySQL et les tests automatisés, nécessitent encore des corrections.  
+L’objectif est de rendre la CI **stable et fiable** pour chaque commit afin de faciliter le développement de l’application Symfony **CityBuilder**.
+
 ## 🚀 Démarrage Rapide
 
 ### Prérequis
