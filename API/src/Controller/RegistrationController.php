@@ -66,10 +66,15 @@ class RegistrationController extends AbstractController
             'grid' => ['size' => 50, 'division' => 20],
             'elements' => []
         ];
+
+        // Générer une couleur aléatoire au format hexadécimal
+        $randomColor = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
+
         $map = new Map();
         $map->setName($data['mapName']);
         $map->setUser($user);
         $map->setConfig($defaultConfig);
+        $map->setColor($randomColor);
         $entityManager->persist($map);
         $entityManager->flush();
 
