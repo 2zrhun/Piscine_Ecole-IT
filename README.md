@@ -79,3 +79,7 @@ src/
 ### Prérequis
 - Three.js ≥ 10.9.2
 - php ≥ 3
+
+  ````
+npm run dev
+  ````
