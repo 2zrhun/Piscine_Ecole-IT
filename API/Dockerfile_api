@@ -1,0 +1,63 @@
+# -----------------------------
+# 🏗️  Stage 1 : Build dependencies
+# -----------------------------
+FROM composer:2 AS vendor
+
+WORKDIR /app
+
+# Copy composer files first to leverage Docker caching
+COPY composer.json composer.lock ./
+
+# Install PHP dependencies (without dev, for production)
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-scripts
+
+# -----------------------------
+# 🌐 Stage 2 : Application runtime
+# -----------------------------
+FROM php:8.3-apache
+
+# Install required system libraries and PHP extensions
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libicu-dev \
+    libzip-dev \
+    libpng-dev \
+    libxml2-dev \
+    libpq-dev \
+    && docker-php-ext-install \
+    intl \
+    pdo \
+    pdo_mysql \
+    zip \
+    opcache
+
+# Enable Apache modules
+RUN a2enmod rewrite headers
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy vendor from build stage
+COPY --from=vendor /app/vendor ./vendor
+
+# Copy project files
+COPY . .
+
+# Set Symfony environment
+ENV APP_ENV=prod
+ENV APP_DEBUG=0
+ENV DATABASE_URL="mysql://symfony:symfony@db:3306/citybuilder_db?serverVersion=8.0"
+
+# Permissions for cache/logs
+RUN mkdir -p var && chown -R www-data:www-data var
+
+# Optimize Symfony cache for production
+RUN php bin/console cache:clear --no-debug --env=prod && \
+    php bin/console cache:warmup --no-debug --env=prod
+
+# Expose Apache port
+EXPOSE 80
+
+# Start Apache in foreground
+CMD ["apache2-foreground"]

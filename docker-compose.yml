@@ -1,39 +1,52 @@
-version: "3.9"
+version: '3.8'
 
 services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: citybuilder
+      dockerfile: docker/api/Dockerfile
+    container_name: citybuilder_api
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "8080:80"
+    environment:
+      DATABASE_URL: "mysql://symfony:symfony@db:3306/citybuilder_db?serverVersion=8.0"
+      APP_ENV: dev
+      APP_DEBUG: 1
     volumes:
-      - .:/var/www/html
+      - ./API:/var/www/html
       - symfony_var:/var/www/html/var
     networks:
       - citybuilder_net
+    restart: unless-stopped
 
   db:
     image: mysql:8.0
     container_name: citybuilder_db
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: citybuilder_db
       MYSQL_USER: symfony
       MYSQL_PASSWORD: symfony
+    ports:
+      -"3306:3306"
     volumes:
       - db_data:/var/lib/mysql
     networks:
       - citybuilder_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     container_name: citybuilder_phpmyadmin
-    restart: always
+    restart: unless-stopped
     depends_on:
       - db
     environment:
@@ -42,9 +55,20 @@ services:
       PMA_PASSWORD: root
       UPLOAD_LIMIT: 64M
     ports:
-      - "8081:80"
+      - "8050:80"
     networks:
       - citybuilder_net
+
+  frontend:
+    image: nginx:alpine
+    container_name: citybuilder_frontend
+    ports:
+      - "8000:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    networks:
+      - citybuilder_net
+    restart: unless-stopped
 
 volumes:
   db_data:

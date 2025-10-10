@@ -4,7 +4,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile_api
     container_name: citybuilder-backend
     ports:
       - "8082:80"  

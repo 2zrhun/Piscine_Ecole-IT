@@ -4,11 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
-    "content-hash": "2d39a1767f783198d8194220a4faf11d",
-=======
-    "content-hash": "818c0e6171b7787fc81174cca0e65079",
->>>>>>> websocket
+    "content-hash": "80022db6370b8b8b8d6bfed715dc27e9",
     "packages": [
         {
             "name": "api-platform/core",
